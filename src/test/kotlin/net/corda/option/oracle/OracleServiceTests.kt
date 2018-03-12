@@ -13,10 +13,10 @@ import net.corda.option.base.contract.OptionContract.Companion.OPTION_CONTRACT_I
 import net.corda.option.base.state.OptionState
 import net.corda.option.oracle.oracle.Oracle
 import net.corda.testing.core.SerializationEnvironmentRule
-import net.corda.testing.core.TEST_TX_TIME
 import net.corda.testing.node.MockServices
 import org.junit.Rule
 import org.junit.Test
+import java.time.Instant
 import java.util.function.Predicate
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -25,10 +25,11 @@ class OracleServiceTests {
     private val mockServices = MockServices(listOf("net.corda.option.base.contract", "net.corda.finance.contracts.asset"))
     private val oracle = Oracle(mockServices)
     private val oracleKey= oracle.services.myInfo.legalIdentities.first().owningKey
+    private val testTxTime = Instant.parse("2015-04-17T12:00:00.00Z")
 
     private val option = OptionState(
             strikePrice = 10.DOLLARS,
-            expiryDate = TEST_TX_TIME + 30.days,
+            expiryDate = testTxTime + 30.days,
             underlyingStock = COMPANY_STOCK_1,
             issuer = MEGA_CORP.party,
             owner = MEGA_CORP.party,
