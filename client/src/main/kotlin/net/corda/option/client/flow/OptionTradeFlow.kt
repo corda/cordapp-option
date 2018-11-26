@@ -143,11 +143,13 @@ object OptionTradeFlow {
             val oracleSignature = subFlow(RequestOracleSig(oracle, ftx))
             val ptxWithOracleSig = ptx.withAdditionalSignature(oracleSignature)
 
+            val sessions = listOf(counterpartySession)
+
             progressTracker.currentStep = OTHERS_SIGN
-            val stx = subFlow(CollectSignaturesFlow(ptxWithOracleSig, listOf(counterpartySession), OTHERS_SIGN.childProgressTracker()))
+            val stx = subFlow(CollectSignaturesFlow(ptxWithOracleSig, sessions, OTHERS_SIGN.childProgressTracker()))
 
             progressTracker.currentStep = FINALISING
-            return subFlow(FinalityFlow(stx))
+            return subFlow(FinalityFlow(stx, sessions))
         }
     }
 }

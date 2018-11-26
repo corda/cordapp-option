@@ -102,10 +102,12 @@ object OptionIssueFlow {
 
             progressTracker.currentStep = OTHERS_SIGN
             val issuerSession = initiateFlow(optionState.issuer)
-            val stx = subFlow(CollectSignaturesFlow(ptxWithOracleSig, listOf(issuerSession), OTHERS_SIGN.childProgressTracker()))
+            val sessions = listOf(issuerSession)
+
+            val stx = subFlow(CollectSignaturesFlow(ptxWithOracleSig, sessions, OTHERS_SIGN.childProgressTracker()))
 
             progressTracker.currentStep = FINALISING
-            return subFlow(FinalityFlow(stx, FINALISING.childProgressTracker()))
+            return subFlow(FinalityFlow(stx, sessions, FINALISING.childProgressTracker()))
         }
     }
 

@@ -72,8 +72,10 @@ object OptionExerciseFlow {
             progressTracker.currentStep = WE_SIGN
             val stx = serviceHub.signInitialTransaction(builder)
 
+            val sessions = (inputOption.participants - ourIdentity).map { initiateFlow(it) }.toSet()
+
             progressTracker.currentStep = FINALISING
-            return subFlow(FinalityFlow(stx))
+            return subFlow(FinalityFlow(stx, sessions))
         }
     }
 }
