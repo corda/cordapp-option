@@ -8,7 +8,7 @@ buildscript {
         quasar_group = 'co.paralleluniverse'
         quasar_version = '0.7.10'
         options_cordapp_version = '4.0.0'
-        corda_platform_version = '4'
+        corda_platform_version = 4
     }
     repositories {
         mavenLocal()
@@ -38,7 +38,7 @@ allprojects {
                  username = System.getenv('CORDA_ARTIFACTORY_USERNAME')
                  password = System.getenv('CORDA_ARTIFACTORY_PASSWORD')
             }
-            url 'https://ci-artifactory.corda.r3cev.com/artifactory/r3-corda-dev' 
+            url 'https://ci-artifactory.corda.r3cev.com/artifactory/r3-corda-dev'
         }*/
     }
 }
@@ -66,8 +66,8 @@ cordapp {
         vendor "r3"
         version "4.0.0"
         version "$options_cordapp_version"
-        targetPlatformVersion = "$corda_platform_version"
-        minimumPlatformVersion = "$corda_platform_version"
+        targetPlatformVersion corda_platform_version.toInteger()
+        minimumPlatformVersion corda_platform_version.toInteger()
     }
 }
 
