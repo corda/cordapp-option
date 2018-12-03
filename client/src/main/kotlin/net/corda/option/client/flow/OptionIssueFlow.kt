@@ -80,7 +80,7 @@ object OptionIssueFlow {
 
             progressTracker.currentStep = ADDING_CASH_PAYMENT
             val optionPrice = OptionState.calculatePremium(optionState, volatility)
-            Cash.generateSpend(serviceHub, builder, optionPrice, optionState.issuer)
+            Cash.generateSpend(serviceHub, builder, optionPrice, ourIdentityAndCert, optionState.issuer)
 
             progressTracker.currentStep = VERIFYING_THE_TX
             builder.verify(serviceHub)
@@ -125,8 +125,8 @@ object OptionIssueFlow {
                 }
             }
 
-            val stx = subFlow(flow)
-            return waitForLedgerCommit(stx.id)
+            val txId = subFlow(flow).id
+            return subFlow(ReceiveFinalityFlow(counterpartySession, expectedTxId = txId))
         }
     }
 }

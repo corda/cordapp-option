@@ -63,8 +63,8 @@ object OptionTradeFlow {
                 }
             }
 
-            val stx = subFlow(flow)
-            return waitForLedgerCommit(stx.id)
+            val txId = subFlow(flow).id
+            return subFlow(ReceiveFinalityFlow(counterpartySession, expectedTxId = txId))
         }
     }
 
@@ -123,7 +123,7 @@ object OptionTradeFlow {
 
             progressTracker.currentStep = ADDING_CASH_PAYMENT
             val optionPrice = OptionState.calculatePremium(inputOption, volatility)
-            Cash.generateSpend(serviceHub, builder, optionPrice, inputOption.owner)
+            Cash.generateSpend(serviceHub, builder, optionPrice, ourIdentityAndCert, inputOption.owner)
 
             progressTracker.currentStep = VERIFYING_THE_TX
             builder.verify(serviceHub)
@@ -143,13 +143,20 @@ object OptionTradeFlow {
             val oracleSignature = subFlow(RequestOracleSig(oracle, ftx))
             val ptxWithOracleSig = ptx.withAdditionalSignature(oracleSignature)
 
-            val sessions = listOf(counterpartySession)
-
             progressTracker.currentStep = OTHERS_SIGN
-            val stx = subFlow(CollectSignaturesFlow(ptxWithOracleSig, sessions, OTHERS_SIGN.childProgressTracker()))
+            val stx = subFlow(CollectSignaturesFlow(ptxWithOracleSig, listOf(counterpartySession), OTHERS_SIGN.childProgressTracker()))
 
             progressTracker.currentStep = FINALISING
-            return subFlow(FinalityFlow(stx, sessions))
+            val finalitySessions = listOf(counterpartySession, initiateFlow(inputOption.issuer))
+            return subFlow(FinalityFlow(stx, finalitySessions))
+        }
+    }
+
+    @InitiatedBy(Responder::class)
+    class FinalityResponder(val counterpartySession: FlowSession) : FlowLogic<Unit>() {
+        @Suspendable
+        override fun call() {
+            subFlow(ReceiveFinalityFlow(counterpartySession))
         }
     }
 }
