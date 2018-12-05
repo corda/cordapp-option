@@ -13,7 +13,7 @@ sourceSets {
 cordapp {
     info {
         name "CorDapp Option Base"
-        vendor "r3"
+        vendor "Corda Open Source"
         version "$options_cordapp_version"
         targetPlatformVersion corda_platform_version.toInteger()
         minimumPlatformVersion corda_platform_version.toInteger()
