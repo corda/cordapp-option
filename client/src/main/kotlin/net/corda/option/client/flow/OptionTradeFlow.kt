@@ -147,7 +147,10 @@ object OptionTradeFlow {
             val stx = subFlow(CollectSignaturesFlow(ptxWithOracleSig, listOf(counterpartySession), OTHERS_SIGN.childProgressTracker()))
 
             progressTracker.currentStep = FINALISING
-            val finalitySessions = listOf(counterpartySession, initiateFlow(inputOption.issuer))
+            var finalitySessions = listOf(counterpartySession)
+            if (ourIdentity != inputOption.issuer) {
+                finalitySessions = finalitySessions.plus(initiateFlow(inputOption.issuer))
+            }
             return subFlow(FinalityFlow(stx, finalitySessions))
         }
     }

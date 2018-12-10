@@ -131,6 +131,22 @@ class OptionTradeFlowTests {
     }
 
     @Test
+    fun `option can be traded back to issuer`() {
+        issueCashToBuyerA()
+        val option = createOption(issuer, buyerA)
+        issueOptionToBuyerA(option)
+        issueCashToIssuer()
+
+        val options = issuerNode.transaction {
+            issuerNode.services.vaultService.queryBy<OptionState>().states
+        }
+        assertEquals(1, options.size)
+
+        val recordedOption = options.single().state.data
+        assertEquals(recordedOption.issuer, recordedOption.owner)
+    }
+
+    @Test
     fun `trade flow can only be run by the current owner`() {
         issueCashToBuyerA()
         val option = createOption(issuer, buyerA)
@@ -154,6 +170,14 @@ class OptionTradeFlowTests {
         val notary = buyerBNode.services.networkMapCache.notaryIdentities.first()
         val flow = CashIssueFlow(Amount(900, OPTION_CURRENCY), OpaqueBytes.of(0x01), notary)
         val future = buyerBNode.startFlow(flow)
+        mockNet.runNetwork()
+        future.getOrThrow()
+    }
+
+    private fun issueCashToIssuer() {
+        val notary = issuerNode.services.networkMapCache.notaryIdentities.first()
+        val flow = CashIssueFlow(Amount(900, OPTION_CURRENCY), OpaqueBytes.of(0x01), notary)
+        val future = issuerNode.startFlow(flow)
         mockNet.runNetwork()
         future.getOrThrow()
     }
