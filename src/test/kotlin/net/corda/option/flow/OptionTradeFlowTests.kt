@@ -27,10 +27,10 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 
 class OptionTradeFlowTests {
+    private val mockNet: MockNetwork = MockNetwork(listOf("net.corda.option.base.contract", "net.corda.option.oracle.oracle", "net.corda.finance"))
     private val issuerNode = mockNet.createPartyNode()
     private val buyerANode = mockNet.createPartyNode()
     private val buyerBNode = mockNet.createPartyNode()
-    private val mockNet: MockNetwork = MockNetwork(listOf("net.corda.option.base.contract", "net.corda.option.oracle.oracle", "net.corda.finance"))
     private val oracleNode = mockNet.createNode(legalName = ORACLE_NAME)
 
     private val issuer = issuerNode.info.legalIdentities.first()
