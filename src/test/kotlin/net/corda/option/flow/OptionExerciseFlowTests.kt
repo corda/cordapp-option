@@ -53,7 +53,7 @@ class OptionExerciseFlowTests {
     }
 
     @Test
-    fun `issue flow records a correctly-formed transaction in both parties' transaction storages`() {
+    fun `issue flow records a correctly-formed transaction in both parties transaction storages`() {
         issueCashToBuyer()
         val option = createOption(issuer, buyer)
         issueOptionToBuyer(option)
