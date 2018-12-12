@@ -136,6 +136,7 @@ class OptionTradeFlowTests {
         val option = createOption(issuer, buyerA)
         issueOptionToBuyerA(option)
         issueCashToIssuer()
+        tradeOptionWithIssuer()
 
         val options = issuerNode.transaction {
             issuerNode.services.vaultService.queryBy<OptionState>().states
@@ -191,6 +192,13 @@ class OptionTradeFlowTests {
 
     private fun tradeOptionWithBuyerB(): SignedTransaction {
         val flow = OptionTradeFlow.Initiator(DUMMY_LINEAR_ID, buyerB)
+        val future = buyerANode.startFlow(flow)
+        mockNet.runNetwork()
+        return future.getOrThrow()
+    }
+
+    private fun tradeOptionWithIssuer(): SignedTransaction {
+        val flow = OptionTradeFlow.Initiator(DUMMY_LINEAR_ID, issuer)
         val future = buyerANode.startFlow(flow)
         mockNet.runNetwork()
         return future.getOrThrow()
