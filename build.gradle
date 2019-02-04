@@ -1,8 +1,8 @@
 buildscript {
     ext {
         corda_release_group = 'com.r3.corda'
-        corda_release_version = '4.0-SNAPSHOT'
-        corda_gradle_plugins_version = '4.0.36'
+        corda_release_version = '4.0-RC01'
+        corda_gradle_plugins_version = '4.0.38'
         kotlin_version = '1.2.71'
         junit_version = '4.12'
         quasar_group = 'co.paralleluniverse'
@@ -42,6 +42,8 @@ allprojects {
                 }
             }
         }
+        maven { url 'https://ci-artifactory.corda.r3cev.com/artifactory/corda-dependencies' }
+        maven { url 'https://ci-artifactory.corda.r3cev.com/artifactory/corda-releases' }
 
         // [Option 2: Add Corda Enterprise binaries in ~/.m2/repository or C:\Documents and Settings\{your-username}\.m2]
         // [Option 3: uncomment the following block and tweak it to point to resolve Corda Enterprise dependencies against a custom path on your local file system.]
@@ -83,7 +85,8 @@ dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
 
     cordaCompile "$corda_release_group:corda-core:$corda_release_version"
-    cordaCompile "$corda_release_group:corda-finance:$corda_release_version"
+    cordaCompile "net.corda:corda-finance-contracts:4.0-RC03"
+    cordaCompile "$corda_release_group:corda-finance-workflows:$corda_release_version"
     cordaCompile "$corda_release_group:corda-jackson:$corda_release_version"
     cordaCompile "$corda_release_group:corda-rpc:$corda_release_version"
     cordaCompile "$corda_release_group:corda-node-api:$corda_release_version"
@@ -95,7 +98,8 @@ dependencies {
     testCompile "junit:junit:$junit_version"
     testCompile "$corda_release_group:corda-node-driver:$corda_release_version"
 
-    cordapp "$corda_release_group:corda-finance:$corda_release_version"
+    cordapp "net.corda:corda-finance-contracts:4.0-RC03"
+    cordapp "$corda_release_group:corda-finance-workflows:$corda_release_version"
     cordapp project(":base")
     cordapp project(":client")
     cordapp project(":oracle")
@@ -109,9 +113,6 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
         javaParameters = true   // Useful for reflection.
     }
 }
-
-
-
 task deployNodes(type: net.corda.plugins.Cordform, dependsOn: ['jar']) {
     directory "./build/nodes"
     node {
@@ -132,7 +133,8 @@ task deployNodes(type: net.corda.plugins.Cordform, dependsOn: ['jar']) {
             adminAddress("localhost:10046")
         }
         webPort 10007
-        cordapps = ["$corda_release_group:corda-finance:$corda_release_version",
+        cordapps = ["net.corda:corda-finance-contracts:4.0-RC03",
+                    "$corda_release_group:corda-finance-workflows:$corda_release_version",
                     "net.corda.option:base:$version",
                     "net.corda.option:client:$version"]
         rpcUsers = [[user: "user1", "password": "test", "permissions": ["ALL"]]]
@@ -145,7 +147,8 @@ task deployNodes(type: net.corda.plugins.Cordform, dependsOn: ['jar']) {
             adminAddress("localhost:10049")
         }
         webPort 10010
-        cordapps = ["$corda_release_group:corda-finance:$corda_release_version",
+        cordapps = ["net.corda:corda-finance-contracts:4.0-RC03",
+                    "$corda_release_group:corda-finance-workflows:$corda_release_version",
                     "net.corda.option:base:$version",
                     "net.corda.option:client:$version"]
         rpcUsers = [[user: "user1", "password": "test", "permissions": ["ALL"]]]
@@ -158,7 +161,8 @@ task deployNodes(type: net.corda.plugins.Cordform, dependsOn: ['jar']) {
             adminAddress("localhost:10052")
         }
         webPort 10013
-        cordapps = ["$corda_release_group:corda-finance:$corda_release_version",
+        cordapps = ["net.corda:corda-finance-contracts:4.0-RC03",
+                    "$corda_release_group:corda-finance-workflows:$corda_release_version",
                     "net.corda.option:base:$version",
                     "net.corda.option:client:$version"]
         rpcUsers = [[user: "user1", "password": "test", "permissions": ["ALL"]]]
@@ -170,7 +174,8 @@ task deployNodes(type: net.corda.plugins.Cordform, dependsOn: ['jar']) {
             address("localhost:10015")
             adminAddress("localhost:10055")
         }
-        cordapps = ["$corda_release_group:corda-finance:$corda_release_version",
+        cordapps = ["net.corda:corda-finance-contracts:4.0-RC03",
+                    "$corda_release_group:corda-finance-workflows:$corda_release_version",
                     "net.corda.option:base:$version",
                     "net.corda.option:oracle:$version"]
         rpcUsers = [[user: "user1", "password": "test", "permissions": ["ALL"]]]
